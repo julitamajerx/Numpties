@@ -1349,6 +1349,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragInteractionObject
   gameManager: {fileID: 425089024}
+  petAnimator: {fileID: 1967110052}
   petLayer:
     serializedVersion: 2
     m_Bits: 8
