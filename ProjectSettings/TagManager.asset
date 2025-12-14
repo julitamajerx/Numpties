@@ -12,7 +12,7 @@ TagManager:
   - Pet
   - Water
   - UI
-  - 
+  - Overlay
   - 
   - 
   - 
@@ -47,6 +47,9 @@ TagManager:
     locked: 0
   - name: Pet
     uniqueID: 2520064229
+    locked: 0
+  - name: Overlay
+    uniqueID: 333024819
     locked: 0
   m_RenderingLayers:
   - Default

@@ -5,27 +5,23 @@ using System.Collections;
 
 public class DragInteractionObject : MonoBehaviour, IDragHandler, IEndDragHandler
 {
-    [SerializeField] private NeedBehaviour gameManager;
+    [SerializeField] private NeedBehaviour needBehaviour;
     [SerializeField] private Animator petAnimator;
-
     [SerializeField] private LayerMask petLayer;
     [SerializeField] private string petTag;
+    [SerializeField] private string animationName = "IsEating";
+    [SerializeField] private string sleepAnimationName = "IsSleeping";
+    [SerializeField] private float animationDuration = 5f;
 
     private RectTransform rectTransform;
     private Image image;
     private Vector2 initialPosition;
-
-    private const string IS_EATING = "IsEating";
-    private const float EAT_DURATION = 5f;
 
     void Start()
     {
         rectTransform = GetComponent<RectTransform>();
         image = GetComponentInChildren<Image>();
         initialPosition = rectTransform.anchoredPosition;
-
-        if (image == null)
-            Debug.LogError("Image component wasn't found.");
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -36,14 +32,24 @@ public class DragInteractionObject : MonoBehaviour, IDragHandler, IEndDragHandle
     public void OnEndDrag(PointerEventData eventData)
     {
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(eventData.position);
-        worldPos.z = 0;
+        worldPos.z = 0f;
 
         RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero, Mathf.Infinity, petLayer);
 
         if (hit.collider != null && hit.collider.CompareTag(petTag))
         {
-            gameManager?.BoostSliderValue();
-            StartCoroutine(EatRoutine());
+            if (animationName == sleepAnimationName)
+            {
+                needBehaviour?.StartSleeping();
+                petAnimator.SetBool(sleepAnimationName, true);
+            }
+            else
+            {
+                needBehaviour?.PauseDecay();
+                needBehaviour?.BoostSliderValue();
+                StartCoroutine(FulfillNeed());
+            }
+
             image.enabled = false;
         }
         else
@@ -52,15 +58,22 @@ public class DragInteractionObject : MonoBehaviour, IDragHandler, IEndDragHandle
         }
     }
 
-    private IEnumerator EatRoutine()
+    private IEnumerator FulfillNeed()
     {
-        petAnimator.SetBool(IS_EATING, true);
+        petAnimator.SetBool(animationName, true);
 
-        yield return new WaitForSeconds(EAT_DURATION);
+        yield return new WaitForSeconds(animationDuration);
 
-        petAnimator.SetBool(IS_EATING, false);
+        petAnimator.SetBool(animationName, false);
+        needBehaviour?.ResumeDecay();
 
         rectTransform.anchoredPosition = initialPosition;
         image.enabled = true;
+    }
+
+    public void StopSleep()
+    {
+        needBehaviour?.StopSleeping();
+        petAnimator.SetBool(sleepAnimationName, false);
     }
 }
