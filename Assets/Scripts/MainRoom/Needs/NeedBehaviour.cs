@@ -24,7 +24,26 @@ public class NeedBehaviour : MonoBehaviour
             return;
         }
 
-        needSlider.value = needSlider.maxValue;
+        string saveKey = "Save_" + gameObject.name;
+
+        if (PlayerPrefs.HasKey(saveKey))
+        {
+            if (gameObject.name == "Fun" || gameObject.name == "Zabawa")
+            {
+                needSlider.value = needSlider.maxValue;
+            }
+            else
+            {
+                needSlider.value = PlayerPrefs.GetFloat(saveKey);
+            }
+
+            PlayerPrefs.DeleteKey(saveKey);
+        }
+        else
+        {
+            needSlider.value = needSlider.maxValue;
+        }
+
         StartDecay();
     }
 
@@ -110,7 +129,4 @@ public class NeedBehaviour : MonoBehaviour
         ResumeDecay();
         OnSleepEnded?.Invoke();
     }
-
-
-
 }

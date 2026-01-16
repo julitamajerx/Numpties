@@ -4,7 +4,6 @@ public class SleepController : MonoBehaviour
 {
     [SerializeField] private NeedBehaviour sleepNeed;
     [SerializeField] private ClickableObject lamp;
-
     [SerializeField] private Animator petAnimator;
     [SerializeField] private string sleepAnimationName = "IsSleeping";
 
@@ -13,6 +12,7 @@ public class SleepController : MonoBehaviour
         sleepNeed.OnSleepEnded += () =>
         {
             petAnimator.SetBool(sleepAnimationName, false);
+            DragInteractionObject.isAnyObjectActive = false;
         };
     }
 
@@ -22,12 +22,16 @@ public class SleepController : MonoBehaviour
         {
             sleepNeed.StartSleeping();
             petAnimator.SetBool(sleepAnimationName, true);
+
+            DragInteractionObject.isAnyObjectActive = true;
         }
 
         if ((lamp.IsOn() || sleepNeed.needSlider.value >= sleepNeed.needSlider.maxValue) && sleepNeed.isSleeping)
         {
             sleepNeed.StopSleeping();
             petAnimator.SetBool(sleepAnimationName, false);
+
+            DragInteractionObject.isAnyObjectActive = false;
         }
     }
-    }
+}

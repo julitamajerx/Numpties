@@ -8,12 +8,11 @@ public class ClickableObject : MonoBehaviour
     public void ToggleState()
     {
         isOn = !isOn;
-        Debug.Log("Stan obiektu: " + (isOn ? "W³¹czone" : "Wy³¹czone"));
+        darkness.SetActive(!isOn);
     }
 
     public bool IsOn()
     {
-        darkness.SetActive(!isOn); 
         return isOn;
     }
 }

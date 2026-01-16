@@ -5,6 +5,8 @@ using System.Collections;
 
 public class DragInteractionObject : MonoBehaviour, IDragHandler, IEndDragHandler
 {
+    public static bool isAnyObjectActive = false;
+
     [SerializeField] private NeedBehaviour needBehaviour;
     [SerializeField] private Animator petAnimator;
     [SerializeField] private LayerMask petLayer;
@@ -26,18 +28,27 @@ public class DragInteractionObject : MonoBehaviour, IDragHandler, IEndDragHandle
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (isAnyObjectActive) return;
         rectTransform.anchoredPosition += eventData.delta / rectTransform.localScale.x;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        if (isAnyObjectActive)
+        {
+            rectTransform.anchoredPosition = initialPosition;
+            return;
+        }
+
         Vector3 worldPos = Camera.main.ScreenToWorldPoint(eventData.position);
         worldPos.z = 0f;
-
         RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero, Mathf.Infinity, petLayer);
 
         if (hit.collider != null && hit.collider.CompareTag(petTag))
         {
+            isAnyObjectActive = true;
+            image.enabled = false;
+
             if (animationName == sleepAnimationName)
             {
                 needBehaviour?.StartSleeping();
@@ -49,8 +60,6 @@ public class DragInteractionObject : MonoBehaviour, IDragHandler, IEndDragHandle
                 needBehaviour?.BoostSliderValue();
                 StartCoroutine(FulfillNeed());
             }
-
-            image.enabled = false;
         }
         else
         {
@@ -61,19 +70,20 @@ public class DragInteractionObject : MonoBehaviour, IDragHandler, IEndDragHandle
     private IEnumerator FulfillNeed()
     {
         petAnimator.SetBool(animationName, true);
-
         yield return new WaitForSeconds(animationDuration);
-
         petAnimator.SetBool(animationName, false);
         needBehaviour?.ResumeDecay();
-
         rectTransform.anchoredPosition = initialPosition;
         image.enabled = true;
+        isAnyObjectActive = false;
     }
 
     public void StopSleep()
     {
-        needBehaviour?.StopSleeping();
         petAnimator.SetBool(sleepAnimationName, false);
+        needBehaviour?.StopSleeping();
+        isAnyObjectActive = false;
+        rectTransform.anchoredPosition = initialPosition;
+        image.enabled = true;
     }
 }
