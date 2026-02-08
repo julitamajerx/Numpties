@@ -18,53 +18,72 @@ public class DragInteractionObject : MonoBehaviour, IDragHandler, IEndDragHandle
     private RectTransform rectTransform;
     private Image image;
     private Vector2 initialPosition;
+    private Canvas canvas;
 
     void Start()
     {
         rectTransform = GetComponent<RectTransform>();
         image = GetComponentInChildren<Image>();
         initialPosition = rectTransform.anchoredPosition;
+        canvas = GetComponentInParent<Canvas>();
     }
 
     public void OnDrag(PointerEventData eventData)
     {
         if (isAnyObjectActive) return;
-        rectTransform.anchoredPosition += eventData.delta / rectTransform.localScale.x;
+
+        // Na Androidzie bezpieczniej jest dzieliæ delta przez scaleFactor canvasu
+        rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
         if (isAnyObjectActive)
         {
-            rectTransform.anchoredPosition = initialPosition;
+            ResetPosition();
             return;
         }
 
-        Vector3 worldPos = Camera.main.ScreenToWorldPoint(eventData.position);
-        worldPos.z = 0f;
-        RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero, Mathf.Infinity, petLayer);
+        // Pobieramy kamerê, która renderuje UI lub g³ówn¹ kamerê
+        Camera cam = eventData.pressEventCamera != null ? eventData.pressEventCamera : Camera.main;
 
-        if (hit.collider != null && hit.collider.CompareTag(petTag))
+        if (cam != null)
         {
-            isAnyObjectActive = true;
-            image.enabled = false;
+            // Konwersja pozycji dotyku/myszki na œwiat 2D
+            Vector3 worldPos = cam.ScreenToWorldPoint(eventData.position);
+            RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero, Mathf.Infinity, petLayer);
 
-            if (animationName == sleepAnimationName)
+            if (hit.collider != null && hit.collider.CompareTag(petTag))
             {
-                needBehaviour?.StartSleeping();
-                petAnimator.SetBool(sleepAnimationName, true);
+                StartInteraction();
+                return;
             }
-            else
-            {
-                needBehaviour?.PauseDecay();
-                needBehaviour?.BoostSliderValue();
-                StartCoroutine(FulfillNeed());
-            }
+        }
+
+        ResetPosition();
+    }
+
+    private void StartInteraction()
+    {
+        isAnyObjectActive = true;
+        image.enabled = false;
+
+        if (animationName == sleepAnimationName)
+        {
+            needBehaviour?.StartSleeping();
+            petAnimator.SetBool(sleepAnimationName, true);
         }
         else
         {
-            rectTransform.anchoredPosition = initialPosition;
+            needBehaviour?.PauseDecay();
+            needBehaviour?.BoostSliderValue();
+            StartCoroutine(FulfillNeed());
         }
+    }
+
+    private void ResetPosition()
+    {
+        rectTransform.anchoredPosition = initialPosition;
     }
 
     private IEnumerator FulfillNeed()
@@ -72,8 +91,9 @@ public class DragInteractionObject : MonoBehaviour, IDragHandler, IEndDragHandle
         petAnimator.SetBool(animationName, true);
         yield return new WaitForSeconds(animationDuration);
         petAnimator.SetBool(animationName, false);
+
         needBehaviour?.ResumeDecay();
-        rectTransform.anchoredPosition = initialPosition;
+        ResetPosition();
         image.enabled = true;
         isAnyObjectActive = false;
     }
@@ -83,7 +103,7 @@ public class DragInteractionObject : MonoBehaviour, IDragHandler, IEndDragHandle
         petAnimator.SetBool(sleepAnimationName, false);
         needBehaviour?.StopSleeping();
         isAnyObjectActive = false;
-        rectTransform.anchoredPosition = initialPosition;
+        ResetPosition();
         image.enabled = true;
     }
 }
