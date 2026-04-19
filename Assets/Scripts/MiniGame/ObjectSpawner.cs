@@ -19,6 +19,8 @@ public class ObjectSpawner : MonoBehaviour
     [SerializeField] private float startSpawnInterval = 2f;
     [SerializeField] private float minSpawnInterval = 0.2f;
     [SerializeField] private float speedUpFactor = 0.03f;
+    [SerializeField] private int minSpawnCount = 1;
+    [SerializeField] private int maxSpawnCount = 4;
 
     private float currentInterval;
     private Camera mainCam;
@@ -47,7 +49,14 @@ public class ObjectSpawner : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(currentInterval);
-            SpawnObject();
+
+            float t = Mathf.InverseLerp(startSpawnInterval, minSpawnInterval, currentInterval);
+            int objectsToSpawn = Mathf.RoundToInt(Mathf.Lerp(minSpawnCount, maxSpawnCount, t));
+
+            for (int i = 0; i < objectsToSpawn; i++)
+            {
+                SpawnObject(t);
+            }
 
             if (currentInterval > minSpawnInterval)
             {
@@ -57,15 +66,13 @@ public class ObjectSpawner : MonoBehaviour
         }
     }
 
-    void SpawnObject()
+    void SpawnObject(float difficultyT)
     {
         float randomX = Random.Range(minX, maxX);
         Vector3 spawnPos = new Vector3(randomX, mainCam.orthographicSize + 1f, 0);
 
-        float t = Mathf.InverseLerp(startSpawnInterval, minSpawnInterval, currentInterval);
-
-        float currentChance = Mathf.Lerp(startFrequentChance, endFrequentChance, t);
-        float currentGravity = Mathf.Lerp(startGravity, endGravity, t);
+        float currentChance = Mathf.Lerp(startFrequentChance, endFrequentChance, difficultyT);
+        float currentGravity = Mathf.Lerp(startGravity, endGravity, difficultyT);
 
         GameObject prefabToSpawn;
         int roll = Random.Range(0, 101);

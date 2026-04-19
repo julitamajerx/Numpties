@@ -774,6 +774,8 @@ MonoBehaviour:
   startSpawnInterval: 2
   minSpawnInterval: 0.5
   speedUpFactor: 0.05
+  minSpawnCount: 1
+  maxSpawnCount: 4
 --- !u!212 &1024076032
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -857,11 +859,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2994335531816858059, guid: 0626eeec6a340894aad82d968e9ac1b1, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 2994335531816858059, guid: 0626eeec6a340894aad82d968e9ac1b1, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1
+      value: 0.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2994335531816858059, guid: 0626eeec6a340894aad82d968e9ac1b1, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 3973341912016417958, guid: 0626eeec6a340894aad82d968e9ac1b1, type: 3}
       propertyPath: m_LocalScale.x
@@ -914,6 +920,18 @@ PrefabInstance:
     - target: {fileID: 3973341912016417958, guid: 0626eeec6a340894aad82d968e9ac1b1, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4066117828931183081, guid: 0626eeec6a340894aad82d968e9ac1b1, type: 3}
+      propertyPath: m_Size.x
+      value: 0.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4066117828931183081, guid: 0626eeec6a340894aad82d968e9ac1b1, type: 3}
+      propertyPath: m_Size.y
+      value: 0.52
+      objectReference: {fileID: 0}
+    - target: {fileID: 4066117828931183081, guid: 0626eeec6a340894aad82d968e9ac1b1, type: 3}
+      propertyPath: m_Offset.x
+      value: -0.01
       objectReference: {fileID: 0}
     - target: {fileID: 6970336371175875970, guid: 0626eeec6a340894aad82d968e9ac1b1, type: 3}
       propertyPath: m_Name

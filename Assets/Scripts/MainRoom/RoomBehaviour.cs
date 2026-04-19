@@ -6,9 +6,8 @@ public class RoomBehaviour : MonoBehaviour
     [SerializeField] private Color[] roomColors;
     [SerializeField] private GameObject[] tools;
     [SerializeField] private GameObject minigame;
+    [SerializeField] private GameObject shop;
     [SerializeField] private ClickableObject lightControl;
-
-    // NOWA TABLICA NA WYSTROJE (DZIECI BACKGROUNDU)
     [SerializeField] private GameObject[] roomDecorations;
 
     private int currentRoomIndex = 0;
@@ -40,24 +39,20 @@ public class RoomBehaviour : MonoBehaviour
 
     private void SetCurrentRoom(int roomIndex)
     {
-        // Ustawienie koloru t³a
         background.color = roomColors[roomIndex];
 
-        // Zarz¹dzanie narzêdziami (tools)
         for (int i = 0; i < tools.Length; i++)
         {
             tools[i].SetActive(i == roomIndex);
         }
 
-        // --- NOWA LOGIKA DLA WYSTROJU ---
         for (int i = 0; i < roomDecorations.Length; i++)
         {
-            // Aktywuje tylko ten wystrój, którego indeks zgadza siê z pokojem
             roomDecorations[i].SetActive(i == roomIndex);
         }
 
-        // Minigierka (tylko w pokoju o indeksie 1)
         minigame.SetActive(roomIndex == 1);
+        shop.SetActive(roomIndex == 0);
     }
 
     private void SaveRoom()

@@ -31,8 +31,6 @@ public class DragInteractionObject : MonoBehaviour, IDragHandler, IEndDragHandle
     public void OnDrag(PointerEventData eventData)
     {
         if (isAnyObjectActive) return;
-
-        // Na Androidzie bezpieczniej jest dzieliæ delta przez scaleFactor canvasu
         rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
     }
 
@@ -44,12 +42,10 @@ public class DragInteractionObject : MonoBehaviour, IDragHandler, IEndDragHandle
             return;
         }
 
-        // Pobieramy kamerê, która renderuje UI lub g³ówn¹ kamerê
         Camera cam = eventData.pressEventCamera != null ? eventData.pressEventCamera : Camera.main;
 
         if (cam != null)
         {
-            // Konwersja pozycji dotyku/myszki na œwiat 2D
             Vector3 worldPos = cam.ScreenToWorldPoint(eventData.position);
             RaycastHit2D hit = Physics2D.Raycast(worldPos, Vector2.zero, Mathf.Infinity, petLayer);
 
